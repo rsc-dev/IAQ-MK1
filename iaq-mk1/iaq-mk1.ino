@@ -80,6 +80,7 @@ void loop()
   Serial.print(ECO2);
   Serial.println(" ppm");
 
+  DumpPMS7003Data();
 
   delay(10*1000); // Sleep for 10 seconds
 }
