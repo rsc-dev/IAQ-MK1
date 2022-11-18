@@ -1,6 +1,8 @@
 # Prerequisites
 *.d
 
+secrets.h
+
 # Object files
 *.o
 *.ko
