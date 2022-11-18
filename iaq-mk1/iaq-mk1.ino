@@ -2,10 +2,33 @@
  * IAQ MK1 firmware.
  * https://github.com/rsc-dev/IAQ-MK1
  */
-
 #include "Wire.h"
 #include "bme680.h"
 #include "ens160.h"
+
+#define ENS0129 2
+
+float last_pm1_0, last_pm2_5, last_pm10_0 = 0.0;
+int co2_level;
+
+void ENS0219_readings(){
+  while (digitalRead(ENS0129) == LOW) {};
+  long t0 = millis();
+  
+  while (digitalRead(ENS0129) == HIGH) {};
+  long t1 = millis();
+  
+  while (digitalRead(ENS0129) == LOW) {};
+  long t2 = millis();
+
+  long tH = t1-t0;
+  long tL = t2-t1;
+  long ppm = 5000L * (tH - 2) / (tH + tL - 4);
+  while (digitalRead(ENS0129) == HIGH) {};
+  
+  co2_level = (int)ppm;
+  delay(10);
+}
 
 void setup()
 {
@@ -25,6 +48,9 @@ void setup()
   float humidity = BME680.readHumidity() / 1000;
 
   setup_ENS160(temperature, humidity);
+
+  //Serial.println("[+] SEN0219...");
+  //setup_SEN0219();
 
   Serial.println("[+] Setup finished.");
 }
@@ -81,6 +107,17 @@ void loop()
   Serial.println(" ppm");
 
   DumpPMS7003Data();
+
+  Serial.print("[PMS7003] PM1.0: ");
+  Serial.println(last_pm1_0);
+  Serial.print("[PMS7003] PM2.5: ");
+  Serial.println(last_pm2_5);
+  Serial.print("[PMS7003] PM10.0: ");
+  Serial.println(last_pm10_0);
+
+  ENS0219_readings();
+  Serial.print("[SEN0219] CO2: ");
+  Serial.println(co2_level);
 
   delay(10*1000); // Sleep for 10 seconds
 }

@@ -1,4 +1,4 @@
-#define  MEAN_NUMBER  10
+#define  MEAN_NUMBER  3
 #define  MAX_PM   0
 #define  MIN_PM   32767
 
@@ -14,6 +14,8 @@ unsigned int pm1_0=0, pm2_5=0, pm10_0=0;
 unsigned int tmp_max_pm1_0, tmp_max_pm2_5, tmp_max_pm10_0; 
 unsigned int tmp_min_pm1_0, tmp_min_pm2_5, tmp_min_pm10_0; 
 byte i=0;
+
+
 
 
 struct PMS7003_framestruct {
@@ -141,13 +143,18 @@ void DumpPMS7003Data () {
     pm2_5 += thisFrame.concPM2_5_CF1;
     pm10_0 += thisFrame.concPM10_0_CF1;
     i++;
-    Serial.print("O");
+    // Serial.print("O");
   }
   else {
-    Serial.print("*");
+    // Serial.print("*");
   }
   
   if(i==MEAN_NUMBER) {
+    last_pm1_0 = (pm1_0-tmp_max_pm1_0-tmp_min_pm1_0)/(MEAN_NUMBER-2);
+    last_pm2_5 = (pm2_5-tmp_max_pm2_5-tmp_min_pm2_5)/(MEAN_NUMBER-2);
+    last_pm10_0 = (pm10_0-tmp_max_pm10_0-tmp_min_pm10_0)/(MEAN_NUMBER-2);
+
+  /*  
   sprintf(printbuf, "[Checksum OK]");
   sprintf(printbuf, "%s PM1.0 = %02x, PM2.5 = %02x, PM10 = %02x", printbuf, 
     (pm1_0-tmp_max_pm1_0-tmp_min_pm1_0)/(MEAN_NUMBER-2), 
@@ -158,6 +165,7 @@ void DumpPMS7003Data () {
     tmp_min_pm1_0, tmp_min_pm2_5, tmp_min_pm10_0);  
   Serial.println();
   Serial.println(printbuf);
+  */
   pm1_0=pm2_5=pm10_0=i=0;
   }
 }
